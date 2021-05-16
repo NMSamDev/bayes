@@ -2,6 +2,7 @@ import csv
 import string
 import sys
 import codecs
+import random
 import hashlib
 import math
 
@@ -51,8 +52,12 @@ with open('./sentiment_labelled/amazon_cells_labelled.txt', 'r') as csv_file:
     pos = 0
     neg = 0
 
+    randomizer = list(range(1,100))
+
     for line in csv_reader:
+        random.shuffle(randomizer)
         w = ''.join([i for i in line[0] if i not in string.punctuation]).lower()
+        # entrada["id"] = hashlib.md5((w + str(randomizer[0])).encode()).hexdigest() # alternativa para añadir mayor aleartorierdad
         entrada["id"] = hashlib.md5(w.encode()).hexdigest()
         entrada["word"] = w
         entrada["clase"] = int(line[1])
@@ -112,4 +117,18 @@ with open('./sentiment_labelled/amazon_cells_labelled.txt', 'r') as csv_file:
 
         for line in newData:
             csv_writer.writerow(line)
+    
+    with open('test_cases.csv', 'w') as test_cases:
+        headers = ['id', 'word', 'clase']
+        csv_writer = csv.DictWriter(test_cases, fieldnames=headers)
+        csv_writer.writeheader()
 
+        for line in test:
+            csv_writer.writerow(line)
+    
+    with open('all_cases.csv', 'w') as all_cases:
+        headers = ['id', 'word', 'clase']
+        csv_writer = csv.DictWriter(all_cases, fieldnames=headers)
+        csv_writer.writeheader()
+        for line in test + training:
+            csv_writer.writerow(line)
