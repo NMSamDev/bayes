@@ -3,7 +3,7 @@ import string
 import sys
 import codecs
 import hashlib
-import collections
+import math
 
 # Diccionarios para contar las palabras segun su clasificacion
 countP = dict()     # Positivo
@@ -69,15 +69,11 @@ with open('./sentiment_labelled/amazon_cells_labelled.txt', 'r') as csv_file:
         else:
             training.append(saveIn[i])
     
-    # print(len(test))
-    # print(len(training))
-    
     # Imprime la lista Training
     # for x in training:
     #     print(x['id'], x['clase'])
-
-    # print(countN.keys())
-
+    
+    # Guarda y cuenta las palabras segun su clase
     for line in training:
         w = line['word']
         word_count(w, line["clase"])
@@ -88,22 +84,32 @@ with open('./sentiment_labelled/amazon_cells_labelled.txt', 'r') as csv_file:
             negW.append(w)
             neg+=1
     
-    
+    # Parte de la formula
+    v = len(count.keys()) # Vocabulario
+    p0 = math.log(neg/len(training))  # log P(POS)
+    p1 = math.log(pos/len(training))  # log P(NEG)
+    newData = []
 
+    # Completado llaves faltantes
+    for word in count.keys():
+        if not (word in countN):
+            countN[word] = 0
+        if not (word in countP):
+            countP[word] = 0
+        newData.append({
+            "Palabra": word,
+            "FrecPos": countP[word],
+            "FrecNeg": countN[word],
+            "LogPos": math.log((countP[word] + 1)/ (pos + v)),
+            "LogNeg": math.log((countN[word] + 1)/ (neg + v))
+        })
+    # print(newData)
 
+    with open('clasification.csv', 'w') as new_file:
+        headers = ['Palabra', 'FrecPos', 'FrecNeg', 'LogPos', 'LogNeg']
+        csv_writer = csv.DictWriter(new_file, fieldnames=headers)
+        csv_writer.writeheader()
 
-# Parte que aun no se usa
-
-# with open('clasification.csv', 'w') as new_file:
-#     headers = ['Palabra', 'FrecPos', 'FrecNeg', 'LogPos', 'LogNeg']
-#     csv_writer = csv.DictWriter(new_file, fieldnames=headers)
-#     csv_writer.writeheader()
-#     for line in csv_reader:
-#         newData.append({
-#         # line[headers[0]]
-#         }
-#         )
-
-# for line in newData:
-#     csv_writer.writerow(line)
+        for line in newData:
+            csv_writer.writerow(line)
 
