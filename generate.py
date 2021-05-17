@@ -106,12 +106,13 @@ with open('./sentiment_labelled/amazon_cells_labelled.txt', 'r') as csv_file:
             "FrecPos": countP[word],
             "FrecNeg": countN[word],
             "LogPos": math.log((countP[word] + 1)/ (pos + v)),
-            "LogNeg": math.log((countN[word] + 1)/ (neg + v))
+            "LogNeg": math.log((countN[word] + 1)/ (neg + v)),
+            "LogP(POS)": p0,
+            "LogP(NEG)": p1
         })
-    # print(newData)
 
-    with open('clasification.csv', 'w') as new_file:
-        headers = ['Palabra', 'FrecPos', 'FrecNeg', 'LogPos', 'LogNeg']
+    with open('modelo.csv', 'w') as new_file:
+        headers = ['Palabra', 'FrecPos', 'FrecNeg', 'LogPos', 'LogNeg', 'LogP(POS)', 'LogP(NEG)']
         csv_writer = csv.DictWriter(new_file, fieldnames=headers)
         csv_writer.writeheader()
 
